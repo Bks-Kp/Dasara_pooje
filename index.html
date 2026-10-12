@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Factory</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            min-height: 100vh;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Top 1/10 of the screen */
+        .top-bar {
+            height: 10vh;
+            width: 100%;
+            background: #000;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid #00ffff;
+            box-shadow: 0 2px 15px #00ffff33;
+        }
+
+        /* Moving glowing text */
+        .smart-factory {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            white-space: nowrap;
+            font-size: clamp(24px, 4vw, 42px);
+            font-weight: bold;
+            color: #00ffff;
+            text-shadow:
+                0 0 5px #00ffff,
+                0 0 10px #00ffff,
+                0 0 20px #00ffff,
+                0 0 40px #0088ff;
+
+            animation:
+                moveText 10s linear infinite,
+                glowText 2s ease-in-out infinite alternate;
+        }
+
+        /* Left to right movement */
+        @keyframes moveText {
+            from {
+                transform: translate(-100%, -50%);
+            }
+            to {
+                transform: translate(100vw, -50%);
+            }
+        }
+
+        /* Continuous glowing effect */
+        @keyframes glowText {
+            from {
+                text-shadow:
+                    0 0 5px #00ffff,
+                    0 0 10px #00ffff;
+            }
+            to {
+                text-shadow:
+                    0 0 10px #00ffff,
+                    0 0 20px #00ffff,
+                    0 0 40px #0088ff,
+                    0 0 60px #0088ff;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="top-bar">
+        <div class="smart-factory">Smart Factory</div>
+    </div>
+</body>
+</html>
