@@ -1,86 +1,283 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="kn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Factory</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ದಸರಾ ಹಬ್ಬದ ಶುಭಾಶಯಗಳು</title>
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <!-- Kannada font -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;600;700&display=swap"
+        rel="stylesheet">
 
-        body {
-            background-color: #000;
-            min-height: 100vh;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
-        }
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        /* Top 1/10 of the screen */
-        .top-bar {
-            height: 10vh;
-            width: 100%;
-            background: #000;
-            position: relative;
-            overflow: hidden;
-            border-bottom: 1px solid #00ffff;
-            box-shadow: 0 2px 15px #00ffff33;
-        }
+    body {
+      min-height: 100vh;
+      overflow: hidden;
+      font-family: 'Noto Sans Kannada', sans-serif;
+      background:
+        radial-gradient(ellipse at center, #8f160b 0%, #430608 55%, #170308 100%);
+      color: #fff3bd;
+    }
 
-        /* Moving glowing text */
-        .smart-factory {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            white-space: nowrap;
-            font-size: clamp(24px, 4vw, 42px);
-            font-weight: bold;
-            color: #00ffff;
-            text-shadow:
-                0 0 5px #00ffff,
-                0 0 10px #00ffff,
-                0 0 20px #00ffff,
-                0 0 40px #0088ff;
+    /* Festive background */
+    .festival {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      isolation: isolate;
+    }
 
-            animation:
-                moveText 10s linear infinite,
-                glowText 2s ease-in-out infinite alternate;
-        }
+    .festival::before {
+      content: "";
+      position: absolute;
+      inset: 18px;
+      border: 3px double #f8c95b;
+      border-radius: 16px;
+      box-shadow: 0 0 30px #ffb52b55,
+                  inset 0 0 35px #ffbf4422;
+      pointer-events: none;
+      z-index: 2;
+    }
 
-        /* Left to right movement */
-        @keyframes moveText {
-            from {
-                transform: translate(-100%, -50%);
-            }
-            to {
-                transform: translate(100vw, -50%);
-            }
-        }
+    /* Golden festive lights */
+    .lights {
+      position: absolute;
+      top: 35px;
+      width: 90%;
+      display: flex;
+      justify-content: space-around;
+      z-index: 1;
+    }
 
-        /* Continuous glowing effect */
-        @keyframes glowText {
-            from {
-                text-shadow:
-                    0 0 5px #00ffff,
-                    0 0 10px #00ffff;
-            }
-            to {
-                text-shadow:
-                    0 0 10px #00ffff,
-                    0 0 20px #00ffff,
-                    0 0 40px #0088ff,
-                    0 0 60px #0088ff;
-            }
-        }
-    </style>
+    .lights span {
+      width: 10px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ffe69b;
+      box-shadow: 0 0 12px 5px #ffb52b;
+      animation: twinkle 1.5s infinite alternate;
+    }
+
+    .lights span:nth-child(even) {
+      animation-delay: .7s;
+    }
+
+    @keyframes twinkle {
+      from { opacity: .45; }
+      to {
+        opacity: 1;
+        box-shadow: 0 0 22px 8px #ffad23;
+      }
+    }
+
+    .top-decoration {
+      position: absolute;
+      top: 65px;
+      width: 100%;
+      text-align: center;
+      font-size: clamp(2rem, 5vw, 4rem);
+      letter-spacing: 12px;
+      filter: drop-shadow(0 0 12px #ffb52b);
+    }
+
+    .subtitle {
+      position: absolute;
+      top: 23%;
+      text-align: center;
+      padding: 0 20px;
+      color: #ffe7a1;
+      font-size: clamp(1rem, 2.5vw, 1.5rem);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .subtitle small {
+      display: block;
+      margin-top: 12px;
+      font-size: .8em;
+      letter-spacing: 1px;
+      color: #fff4d3;
+    }
+
+    /* Moving Kannada greeting */
+    .marquee-area {
+      position: absolute;
+      top: 43%;
+      width: 100%;
+      overflow: hidden;
+      padding: 25px 0;
+      z-index: 3;
+    }
+
+    .greeting {
+      width: max-content;
+      white-space: nowrap;
+      font-size: clamp(2rem, 6vw, 5rem);
+      font-weight: 700;
+      color: #ffdf70;
+      text-shadow:
+        0 0 8px #ffae00,
+        0 0 22px #ff6a00,
+        3px 4px 2px #450000;
+      animation: moveRight 12s linear infinite;
+    }
+
+    @keyframes moveRight {
+      from { transform: translateX(-100%); }
+      to   { transform: translateX(100vw); }
+    }
+
+    /* Festive lamps */
+    .lamps {
+      position: absolute;
+      bottom: 13%;
+      width: 100%;
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+      font-size: clamp(2rem, 5vw, 4rem);
+      z-index: 1;
+    }
+
+    .lamp {
+      animation: glow 2s ease-in-out infinite alternate;
+      filter: drop-shadow(0 0 12px #ff9d00);
+    }
+
+    @keyframes glow {
+      from { transform: translateY(0); }
+      to { transform: translateY(-8px); }
+    }
+
+    .bottom-message {
+      position: absolute;
+      bottom: 6%;
+      text-align: center;
+      color: #ffe8a5;
+      font-size: clamp(.8rem, 2vw, 1.2rem);
+      letter-spacing: 2px;
+      padding: 0 30px;
+    }
+
+    /* Floating flower petals */
+    .petal {
+      position: absolute;
+      top: -40px;
+      z-index: 0;
+      animation: fall linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(110vh) rotate(540deg);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .top-decoration {
+        top: 85px;
+        letter-spacing: 3px;
+      }
+
+      .subtitle {
+        top: 28%;
+        letter-spacing: 1px;
+      }
+
+      .marquee-area {
+        top: 44%;
+      }
+
+      .greeting {
+        animation-duration: 10s;
+      }
+
+      .lamps {
+        bottom: 17%;
+      }
+
+      .bottom-message {
+        bottom: 8%;
+        letter-spacing: 1px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .greeting, .lamp, .lights span, .petal {
+        animation-play-state: paused;
+      }
+    }
+  </style>
 </head>
 
 <body>
-    <div class="top-bar">
-        <div class="smart-factory">Smart Factory</div>
+  <main class="festival">
+
+    <div class="lights" aria-hidden="true">
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
     </div>
+
+    <div class="top-decoration" aria-hidden="true">
+      🌼 🪷 🌺 🪷 🌼
+    </div>
+
+    <div class="subtitle">
+      ✨ HAPPY DASARA ✨
+      <small>Festival of Victory • Prosperity • Happiness</small>
+    </div>
+
+    <section class="marquee-area"
+             aria-label="ದಸರಾ ಹಬ್ಬದ ಶುಭಾಶಯಗಳು">
+      <div class="greeting">
+        🌺 ದಸರಾ ಹಬ್ಬದ ಶುಭಾಶಯಗಳು 🌺
+      </div>
+    </section>
+
+    <div class="lamps" aria-hidden="true">
+      <span class="lamp">🪔</span>
+      <span class="lamp">🌸</span>
+      <span class="lamp">🪔</span>
+      <span class="lamp">🌼</span>
+      <span class="lamp">🪔</span>
+    </div>
+
+    <div class="bottom-message">
+      May this Dasara bring joy, success & prosperity 🙏
+    </div>
+
+  </main>
+
+  <script>
+    // Create gently falling flower petals
+    const flowers = ["🌼", "🌸", "🌺", "✨"];
+
+    for (let i = 0; i < 24; i++) {
+      const petal = document.createElement("span");
+      petal.className = "petal";
+      petal.textContent =
+        flowers[Math.floor(Math.random() * flowers.length)];
+
+      petal.style.left = Math.random() * 100 + "vw";
+      petal.style.animationDuration = (7 + Math.random() * 10) + "s";
+      petal.style.animationDelay = (-Math.random() * 15) + "s";
+      petal.style.fontSize = (14 + Math.random() * 18) + "px";
+
+      document.querySelector(".festival").appendChild(petal);
+    }
+  </script>
 </body>
 </html>
