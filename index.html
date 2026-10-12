@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>ದಸರಾ ಹಬ್ಬದ ಶುಭಾಶಯಗಳು</title>
 
   <!-- Kannada font -->
@@ -22,14 +23,20 @@
       overflow: hidden;
       font-family: 'Noto Sans Kannada', sans-serif;
       background:
-        radial-gradient(ellipse at center, #8f160b 0%, #430608 55%, #170308 100%);
+        radial-gradient(
+          ellipse at center,
+          #8f160b 0%,
+          #430608 55%,
+          #170308 100%
+        );
       color: #fff3bd;
     }
 
-    /* Festive background */
+    /* Main festival background */
     .festival {
       position: relative;
       min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -38,26 +45,28 @@
       isolation: isolate;
     }
 
+    /* Golden decorative border */
     .festival::before {
       content: "";
       position: absolute;
       inset: 18px;
       border: 3px double #f8c95b;
       border-radius: 16px;
-      box-shadow: 0 0 30px #ffb52b55,
-                  inset 0 0 35px #ffbf4422;
+      box-shadow:
+        0 0 30px #ffb52b55,
+        inset 0 0 35px #ffbf4422;
       pointer-events: none;
-      z-index: 2;
+      z-index: 4;
     }
 
-    /* Golden festive lights */
+    /* Glowing lights at the top */
     .lights {
       position: absolute;
       top: 35px;
       width: 90%;
       display: flex;
       justify-content: space-around;
-      z-index: 1;
+      z-index: 2;
     }
 
     .lights span {
@@ -70,60 +79,36 @@
     }
 
     .lights span:nth-child(even) {
-      animation-delay: .7s;
+      animation-delay: 0.7s;
     }
 
     @keyframes twinkle {
-      from { opacity: .45; }
+      from {
+        opacity: 0.45;
+      }
+
       to {
         opacity: 1;
         box-shadow: 0 0 22px 8px #ffad23;
       }
     }
 
-    .top-decoration {
+    /* Kannada greeting at the top */
+    .top-greeting {
       position: absolute;
-      top: 65px;
-      width: 100%;
-      text-align: center;
-      font-size: clamp(2rem, 5vw, 4rem);
-      letter-spacing: 12px;
-      filter: drop-shadow(0 0 12px #ffb52b);
-    }
-
-    .subtitle {
-      position: absolute;
-      top: 23%;
-      text-align: center;
-      padding: 0 20px;
-      color: #ffe7a1;
-      font-size: clamp(1rem, 2.5vw, 1.5rem);
-      letter-spacing: 3px;
-      text-transform: uppercase;
-    }
-
-    .subtitle small {
-      display: block;
-      margin-top: 12px;
-      font-size: .8em;
-      letter-spacing: 1px;
-      color: #fff4d3;
-    }
-
-    /* Moving Kannada greeting */
-    .marquee-area {
-      position: absolute;
-      top: 43%;
+      top: 75px;
+      left: 0;
       width: 100%;
       overflow: hidden;
-      padding: 25px 0;
+      padding: 20px 0;
       z-index: 3;
     }
 
+    /* Moving greeting */
     .greeting {
       width: max-content;
       white-space: nowrap;
-      font-size: clamp(2rem, 6vw, 5rem);
+      font-size: clamp(1.5rem, 5vw, 3.5rem);
       font-weight: 700;
       color: #ffdf70;
       text-shadow:
@@ -134,11 +119,16 @@
     }
 
     @keyframes moveRight {
-      from { transform: translateX(-100%); }
-      to   { transform: translateX(100vw); }
+      from {
+        transform: translateX(-100%);
+      }
+
+      to {
+        transform: translateX(100vw);
+      }
     }
 
-    /* Festive lamps */
+    /* Festive lamps and flowers */
     .lamps {
       position: absolute;
       bottom: 13%;
@@ -156,25 +146,32 @@
     }
 
     @keyframes glow {
-      from { transform: translateY(0); }
-      to { transform: translateY(-8px); }
+      from {
+        transform: translateY(0);
+      }
+
+      to {
+        transform: translateY(-8px);
+      }
     }
 
+    /* Bottom greeting */
     .bottom-message {
       position: absolute;
       bottom: 6%;
       text-align: center;
       color: #ffe8a5;
-      font-size: clamp(.8rem, 2vw, 1.2rem);
+      font-size: clamp(0.8rem, 2vw, 1.2rem);
       letter-spacing: 2px;
       padding: 0 30px;
+      z-index: 2;
     }
 
-    /* Floating flower petals */
+    /* Falling flower petals */
     .petal {
       position: absolute;
       top: -40px;
-      z-index: 0;
+      z-index: 1;
       animation: fall linear infinite;
       pointer-events: none;
     }
@@ -185,19 +182,10 @@
       }
     }
 
+    /* Mobile responsive design */
     @media (max-width: 600px) {
-      .top-decoration {
-        top: 85px;
-        letter-spacing: 3px;
-      }
-
-      .subtitle {
-        top: 28%;
-        letter-spacing: 1px;
-      }
-
-      .marquee-area {
-        top: 44%;
+      .top-greeting {
+        top: 65px;
       }
 
       .greeting {
@@ -214,8 +202,12 @@
       }
     }
 
+    /* Accessibility: respect reduced motion */
     @media (prefers-reduced-motion: reduce) {
-      .greeting, .lamp, .lights span, .petal {
+      .greeting,
+      .lamp,
+      .lights span,
+      .petal {
         animation-play-state: paused;
       }
     }
@@ -223,30 +215,33 @@
 </head>
 
 <body>
+
   <main class="festival">
 
+    <!-- Festive glowing lights -->
     <div class="lights" aria-hidden="true">
-      <span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
     </div>
 
-    <div class="top-decoration" aria-hidden="true">
-      🌼 🪷 🌺 🪷 🌼
-    </div>
-
-    <div class="subtitle">
-      ✨ HAPPY DASARA ✨
-      <small>Festival of Victory • Prosperity • Happiness</small>
-    </div>
-
-    <section class="marquee-area"
-             aria-label="ದಸರಾ ಹಬ್ಬದ ಶುಭಾಶಯಗಳು">
+    <!-- Kannada greeting moving at the top -->
+    <div class="top-greeting">
       <div class="greeting">
         🌺 ದಸರಾ ಹಬ್ಬದ ಶುಭಾಶಯಗಳು 🌺
       </div>
-    </section>
+    </div>
 
+    <!-- Festive diyas and flowers -->
     <div class="lamps" aria-hidden="true">
       <span class="lamp">🪔</span>
       <span class="lamp">🌸</span>
@@ -255,29 +250,39 @@
       <span class="lamp">🪔</span>
     </div>
 
+    <!-- Bottom message -->
     <div class="bottom-message">
-      May this Dasara bring joy, success & prosperity 🙏
+      May this Dasara bring joy, success &amp; prosperity 🙏
     </div>
 
   </main>
 
   <script>
-    // Create gently falling flower petals
+    // Create falling festive petals
     const flowers = ["🌼", "🌸", "🌺", "✨"];
+    const festival = document.querySelector(".festival");
 
     for (let i = 0; i < 24; i++) {
       const petal = document.createElement("span");
+
       petal.className = "petal";
       petal.textContent =
         flowers[Math.floor(Math.random() * flowers.length)];
 
       petal.style.left = Math.random() * 100 + "vw";
-      petal.style.animationDuration = (7 + Math.random() * 10) + "s";
-      petal.style.animationDelay = (-Math.random() * 15) + "s";
-      petal.style.fontSize = (14 + Math.random() * 18) + "px";
 
-      document.querySelector(".festival").appendChild(petal);
+      petal.style.animationDuration =
+        (7 + Math.random() * 10) + "s";
+
+      petal.style.animationDelay =
+        (-Math.random() * 15) + "s";
+
+      petal.style.fontSize =
+        (14 + Math.random() * 18) + "px";
+
+      festival.appendChild(petal);
     }
   </script>
+
 </body>
 </html>
