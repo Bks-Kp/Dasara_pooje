@@ -2,570 +2,313 @@
 <html lang="kn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mysuru Dasara Grand Animation (0:00 - 0:20s)</title>
-    <!-- Tailwind CSS CDN -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mysuru Dasara Festival Canvas</title>
+    <!-- Tailwind CSS for utility styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts for Kannada and English Festive Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Noto+Serif+Kannada:wght@600;800;900&family=Tiro+Kannada:ital@0;1&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Noto+Serif+Kannada:wght@700;800;900&family=Tiro+Kannada:ital@0;1&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
         * {
             box-sizing: border-box;
             user-select: none;
             -webkit-user-select: none;
-        }
-
-        body {
             margin: 0;
             padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
             overflow: hidden;
             background: #02020a;
-            font-family: 'Inter', sans-serif;
-            color: #ffffff;
-            height: 100vh;
+            cursor: none; /* Ideal for kiosk/display wall running all day */
+        }
+
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100vw;
-        }
-
-        .kannada-font {
-            font-family: 'Noto Serif Kannada', 'Tiro Kannada', serif;
-        }
-
-        .english-festive {
-            font-family: 'Cinzel', serif;
-            letter-spacing: 0.28em;
-        }
-
-        /* Glassmorphism control bar */
-        .glass-panel {
-            background: rgba(10, 10, 26, 0.78);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border: 1px solid rgba(255, 215, 0, 0.25);
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.8), 0 0 20px rgba(234, 179, 8, 0.15);
-        }
-
-        /* Golden shimmer text clip */
-        .gold-gradient-text {
-            background: linear-gradient(135deg, #fff7ad 0%, #ffa726 40%, #ffd700 70%, #ff8008 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* Custom timeline scrubber */
-        input[type=range] {
-            -webkit-appearance: none;
-            background: transparent;
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 18px;
-            width: 18px;
-            border-radius: 50%;
-            background: #ffd700;
-            cursor: pointer;
-            box-shadow: 0 0 10px #ffb300, 0 0 16px rgba(255, 215, 0, 0.8);
-            border: 2px solid #ffffff;
-            margin-top: -6px;
-        }
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 6px;
-            cursor: pointer;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 3px;
-        }
-
-        /* Top 1/9th guideline indicator for preview verification */
-        .guide-line {
-            pointer-events: none;
-            border-bottom: 1px dashed rgba(255, 215, 0, 0.25);
+            height: 100vh;
         }
     </style>
 </head>
-<body class="relative flex flex-col justify-between items-center w-full h-full bg-slate-950">
-
-    <!-- Main Fullscreen Animation Canvas -->
-    <canvas id="stageCanvas" class="absolute inset-0 w-full h-full block z-0"></canvas>
-
-    <!-- Top 1/9th Indicator Guide (Subtle Visual Badge) -->
-    <div id="guideZone" class="guide-line absolute top-0 left-0 w-full pointer-events-none z-10 transition-opacity duration-300 opacity-60 flex items-end justify-between px-6 pb-1">
-        <span class="text-[10px] tracking-wider uppercase font-mono text-amber-300/60 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-500/30">
-            Top 1/9th Flight Corridor [0:00 – 0:02s Entry & Flight]
-        </span>
-        <span id="speedIndicator" class="text-[10px] font-mono text-cyan-300/80"></span>
-    </div>
-
-    <!-- Live Phase Badge (Center Top) -->
-    <div class="absolute top-4 z-20 pointer-events-none text-center">
-        <div id="phaseBadge" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel text-xs md:text-sm font-semibold tracking-wide text-amber-200 border border-amber-400/40 shadow-lg shadow-amber-500/10 transition-all duration-300">
-            <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span>
-            <span id="phaseText">0:00 – 0:02s Entry</span>
-        </div>
-    </div>
-
-    <!-- Audio FX notification / Tip -->
-    <div id="audioToast" class="absolute top-16 right-4 z-20 pointer-events-none transition-opacity duration-500 opacity-0 bg-amber-900/80 border border-amber-400 text-amber-100 text-xs px-3 py-1.5 rounded-lg shadow-xl backdrop-blur-md">
-        Royal Chimes & Trumpet Audio Synthesizer Active
-    </div>
-
-    <!-- Bottom Interactive Control Suite -->
-    <footer class="relative z-30 w-full max-w-5xl px-4 pb-4 md:pb-6 pointer-events-auto">
-        <div class="glass-panel rounded-2xl p-3 md:p-4 flex flex-col gap-2.5">
-            <!-- Timeline & Timecode Row -->
-            <div class="flex items-center justify-between gap-4">
-                <div class="flex items-center gap-2 min-w-[130px]">
-                    <div class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></div>
-                    <span id="timecodeDisplay" class="font-mono text-sm md:text-base font-bold text-amber-300 tracking-wider">00:00.00</span>
-                    <span class="text-xs text-slate-400">/ 00:20.00</span>
-                </div>
-
-                <!-- Custom Scrubber Bar -->
-                <div class="relative flex-1 flex items-center">
-                    <input id="timelineScrubber" type="range" min="0" max="20" step="0.01" value="0" class="w-full">
-                    <!-- Milestones badges along scrubber -->
-                    <div class="absolute -bottom-4 w-full flex justify-between text-[9px] font-mono text-slate-400 pointer-events-none px-1">
-                        <span>0s Entry</span>
-                        <span class="text-amber-400">2s Trail</span>
-                        <span class="text-cyan-400">5.5s Reveal</span>
-                        <span class="text-emerald-400">9.5s Exit & Hold</span>
-                        <span>20s</span>
-                    </div>
-                </div>
-
-                <div class="text-xs font-mono text-amber-200/80 hidden sm:block">
-                    20s Sequence
-                </div>
-            </div>
-
-            <!-- Action Controls Row -->
-            <div class="flex items-center justify-between pt-2 border-t border-amber-500/20">
-                <!-- Playback Buttons -->
-                <div class="flex items-center gap-2">
-                    <!-- Play / Pause -->
-                    <button id="playPauseBtn" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl text-xs md:text-sm flex items-center gap-2 shadow-lg shadow-amber-500/20 active:scale-95 transition-all">
-                        <svg id="playIcon" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                        <svg id="pauseIcon" class="w-4 h-4 fill-current hidden" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                        <span id="playPauseLabel">Play</span>
-                    </button>
-
-                    <!-- Restart Button -->
-                    <button id="restartBtn" class="px-3 py-2 bg-slate-800/80 hover:bg-slate-700/80 text-amber-200 border border-amber-500/30 rounded-xl text-xs md:text-sm flex items-center gap-1.5 active:scale-95 transition-all" title="Restart Sequence (0:00)">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                        <span>Replay</span>
-                    </button>
-
-                    <!-- Jump Phase Buttons -->
-                    <div class="hidden lg:flex items-center gap-1 ml-2">
-                        <button class="phase-jump text-[11px] px-2 py-1 rounded bg-slate-800/60 hover:bg-amber-950/60 border border-slate-700 text-slate-300 hover:text-amber-300 transition" data-time="0">0s Entry</button>
-                        <button class="phase-jump text-[11px] px-2 py-1 rounded bg-slate-800/60 hover:bg-amber-950/60 border border-slate-700 text-slate-300 hover:text-amber-300 transition" data-time="2">2s Trail</button>
-                        <button class="phase-jump text-[11px] px-2 py-1 rounded bg-slate-800/60 hover:bg-amber-950/60 border border-slate-700 text-slate-300 hover:text-amber-300 transition" data-time="5.5">5.5s Reveal</button>
-                        <button class="phase-jump text-[11px] px-2 py-1 rounded bg-slate-800/60 hover:bg-amber-950/60 border border-slate-700 text-slate-300 hover:text-amber-300 transition" data-time="9.5">9.5s Exit & Hold</button>
-                    </div>
-                </div>
-
-                <!-- Utilities: Audio Toggle & Guide Toggle -->
-                <div class="flex items-center gap-2">
-                    <button id="toggleGuideBtn" class="px-2.5 py-1.5 bg-slate-800/60 hover:bg-slate-700 text-slate-300 rounded-lg text-xs border border-slate-700 flex items-center gap-1.5 transition">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"></path></svg>
-                        <span class="hidden sm:inline">1/9th Guide</span>
-                    </button>
-
-                    <button id="audioToggleBtn" class="px-3 py-1.5 bg-amber-950/60 hover:bg-amber-900/70 text-amber-300 rounded-lg text-xs border border-amber-500/40 flex items-center gap-1.5 transition shadow-sm">
-                        <svg id="audioOnIcon" class="w-4 h-4 fill-current hidden" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-                        <svg id="audioOffIcon" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73 4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
-                        <span id="audioLabel">Sound FX</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </footer>
+<body class="w-full h-full bg-[#02020a] overflow-hidden">
+    <canvas id="stageCanvas"></canvas>
 
     <script>
-        // Web Audio API Procedural Synthesizer for Festive Indian Dasara Vibe (Taal bells, Royal Fanfare, Shimmer)
-        class FestiveAudioEngine {
-            constructor() {
-                this.ctx = null;
-                this.enabled = false;
-                this.lastBellTime = 0;
-            }
-
-            init() {
-                if (!this.ctx) {
-                    const AudioContext = window.AudioContext || window.webkitAudioContext;
-                    this.ctx = new AudioContext();
-                }
-                if (this.ctx.state === 'suspended') {
-                    this.ctx.resume();
-                }
-            }
-
-            toggle() {
-                this.init();
-                this.enabled = !this.enabled;
-                return this.enabled;
-            }
-
-            // High shimmer for neon contrail
-            playSparkle(pitch = 800) {
-                if (!this.enabled || !this.ctx) return;
-                try {
-                    const now = this.ctx.currentTime;
-                    const osc = this.ctx.createOscillator();
-                    const gain = this.ctx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(pitch + (Math.random() * 400 - 200), now);
-                    osc.frequency.exponentialRampToValueAtTime(1400 + Math.random() * 600, now + 0.15);
-
-                    gain.gain.setValueAtTime(0.04, now);
-                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
-
-                    osc.connect(gain);
-                    gain.connect(this.ctx.destination);
-
-                    osc.start(now);
-                    osc.stop(now + 0.22);
-                } catch(e) {}
-            }
-
-            // Majestic temple bell / bronze chime resonance
-            playTempleChime(freq = 520) {
-                if (!this.enabled || !this.ctx) return;
-                try {
-                    const now = this.ctx.currentTime;
-                    if (now - this.lastBellTime < 0.2) return;
-                    this.lastBellTime = now;
-
-                    const osc1 = this.ctx.createOscillator();
-                    const osc2 = this.ctx.createOscillator();
-                    const gain = this.ctx.createGain();
-
-                    osc1.type = 'sine';
-                    osc2.type = 'triangle';
-                    osc1.frequency.setValueAtTime(freq, now);
-                    osc2.frequency.setValueAtTime(freq * 1.503, now); // Metallic harmonic
-
-                    gain.gain.setValueAtTime(0.12, now);
-                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.8);
-
-                    osc1.connect(gain);
-                    osc2.connect(gain);
-                    gain.connect(this.ctx.destination);
-
-                    osc1.start(now);
-                    osc2.start(now);
-                    osc1.stop(now + 1.9);
-                    osc2.stop(now + 1.9);
-                } catch(e) {}
-            }
-
-            // Royal low drone for entry & hold
-            playRoyalRumble() {
-                if (!this.enabled || !this.ctx) return;
-                try {
-                    const now = this.ctx.currentTime;
-                    const osc = this.ctx.createOscillator();
-                    const gain = this.ctx.createGain();
-                    osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(110, now);
-                    osc.frequency.exponentialRampToValueAtTime(165, now + 1.5);
-
-                    const filter = this.ctx.createBiquadFilter();
-                    filter.type = 'lowpass';
-                    filter.frequency.setValueAtTime(320, now);
-
-                    gain.gain.setValueAtTime(0.06, now);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 1.6);
-
-                    osc.connect(filter);
-                    filter.connect(gain);
-                    gain.connect(this.ctx.destination);
-
-                    osc.start(now);
-                    osc.stop(now + 1.7);
-                } catch(e) {}
-            }
-        }
-
-        const soundEngine = new FestiveAudioEngine();
-
         const canvas = document.getElementById('stageCanvas');
         const ctx = canvas.getContext('2d');
-        const scrubber = document.getElementById('timelineScrubber');
-        const timecodeDisplay = document.getElementById('timecodeDisplay');
-        const playPauseBtn = document.getElementById('playPauseBtn');
-        const playIcon = document.getElementById('playIcon');
-        const pauseIcon = document.getElementById('pauseIcon');
-        const playPauseLabel = document.getElementById('playPauseLabel');
-        const restartBtn = document.getElementById('restartBtn');
-        const phaseBadge = document.getElementById('phaseBadge');
-        const phaseText = document.getElementById('phaseText');
-        const guideZone = document.getElementById('guideZone');
-        const toggleGuideBtn = document.getElementById('toggleGuideBtn');
-        const audioToggleBtn = document.getElementById('audioToggleBtn');
-        const audioOnIcon = document.getElementById('audioOnIcon');
-        const audioOffIcon = document.getElementById('audioOffIcon');
-        const audioLabel = document.getElementById('audioLabel');
-        const audioToast = document.getElementById('audioToast');
-        const speedIndicator = document.getElementById('speedIndicator');
-        const phaseJumpButtons = document.querySelectorAll('.phase-jump');
 
+        const DURATION = 20.0; // 20-second loop specification
         let width = 0;
         let height = 0;
-        let dpr = window.devicePixelRatio || 1;
-        let topFlightHeight = 0; // Strictly 1/9th of the screen height
+        let dpr = 1;
+        let topFlightHeight = 0; // Strictly top 1/9th boundary
+        let corridorCenterY = 0;
+
+        // Background Starfield
+        const STARS = [];
+        const STAR_COUNT = 160;
+
+        // Fireworks & festive bursts
+        const FIREWORKS = [];
+        const MAX_FIREWORKS = 120;
+
+        // Target pixel points for particle consolidation
+        const TARGET_POINTS = [];
+        const PARTICLES = [];
+        const MAX_PARTICLES = 900;
+
+        // Trail history buffers for left & right elephants
+        const leftContrailHistory = [];
+        const rightContrailHistory = [];
 
         function resize() {
             width = window.innerWidth;
             height = window.innerHeight;
-            dpr = window.devicePixelRatio || 1;
-            canvas.width = width * dpr;
-            canvas.height = height * dpr;
-            ctx.scale(dpr, dpr);
+            dpr = Math.min(window.devicePixelRatio || 1, 2);
 
+            canvas.width = Math.floor(width * dpr);
+            canvas.height = Math.floor(height * dpr);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            // Strictly 1/9th of the screen height
             topFlightHeight = height / 9;
-            guideZone.style.height = `${topFlightHeight}px`;
+            corridorCenterY = topFlightHeight * 0.52;
 
-            // Pre-rasterize target text points for particle consolidation
             sampleTargetTextPoints();
+            initContrailsAndParticles();
         }
 
         window.addEventListener('resize', resize);
 
-        let currentTime = 0; // In seconds, from 0.00 to 20.00
-        const DURATION = 20.0;
-        let isPlaying = true;
-        let lastFrameTimestamp = null;
-        let showGuide = true;
-
-        // Toggle 1/9th guide visibility
-        toggleGuideBtn.addEventListener('click', () => {
-            showGuide = !showGuide;
-            guideZone.style.opacity = showGuide ? '0.6' : '0';
-        });
-
-        // Audio Toggle
-        audioToggleBtn.addEventListener('click', () => {
-            const enabled = soundEngine.toggle();
-            if (enabled) {
-                audioOnIcon.classList.remove('hidden');
-                audioOffIcon.classList.add('hidden');
-                audioLabel.textContent = 'Audio ON';
-                audioToast.style.opacity = '1';
-                setTimeout(() => audioToast.style.opacity = '0', 3000);
-                soundEngine.playTempleChime(580);
-            } else {
-                audioOnIcon.classList.add('hidden');
-                audioOffIcon.classList.remove('hidden');
-                audioLabel.textContent = 'Sound FX';
-                audioToast.style.opacity = '0';
-            }
-        });
-
-        // Play/Pause Control
-        function setPlayState(playing) {
-            isPlaying = playing;
-            if (isPlaying) {
-                playIcon.classList.add('hidden');
-                pauseIcon.classList.remove('hidden');
-                playPauseLabel.textContent = 'Pause';
-                lastFrameTimestamp = performance.now();
-                requestAnimationFrame(animationLoop);
-            } else {
-                playIcon.classList.remove('hidden');
-                pauseIcon.classList.add('hidden');
-                playPauseLabel.textContent = 'Play';
+        function initStars() {
+            STARS.length = 0;
+            for (let i = 0; i < STAR_COUNT; i++) {
+                STARS.push({
+                    x: Math.random(),
+                    y: Math.random() * 0.85,
+                    r: Math.random() * 1.4 + 0.4,
+                    alpha: Math.random() * 0.75 + 0.25,
+                    twinkleSpeed: Math.random() * 2.5 + 1.0
+                });
             }
         }
+        initStars();
 
-        playPauseBtn.addEventListener('click', () => {
-            setPlayState(!isPlaying);
-        });
+        function sampleTargetTextPoints() {
+            TARGET_POINTS.length = 0;
+            const off = document.createElement('canvas');
+            off.width = width;
+            off.height = height;
+            const octx = off.getContext('2d');
 
-        restartBtn.addEventListener('click', () => {
-            currentTime = 0;
-            scrubber.value = 0;
-            initContrailsAndParticles();
-            setPlayState(true);
-            soundEngine.playTempleChime(440);
-        });
+            octx.clearRect(0, 0, width, height);
+            octx.textAlign = 'center';
+            octx.textBaseline = 'middle';
 
-        scrubber.addEventListener('input', (e) => {
-            currentTime = parseFloat(e.target.value);
-            updateUI();
-        });
+            // Fit text comfortably within the top 1/9th zone between cruising elephants
+            const isNarrow = width < 768;
+            const kannadaFontSize = Math.min(Math.max(topFlightHeight * (isNarrow ? 0.32 : 0.36), 13), 28);
+            const engFontSize = Math.min(Math.max(topFlightHeight * (isNarrow ? 0.24 : 0.26), 10), 20);
 
-        phaseJumpButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                currentTime = parseFloat(btn.dataset.time);
-                scrubber.value = currentTime;
-                updateUI();
-                soundEngine.playTempleChime(660);
-            });
-        });
+            octx.fillStyle = '#ffffff';
 
-        // Format seconds into mm:ss.ms
-        function formatTimecode(sec) {
-            const m = Math.floor(sec / 60);
-            const s = Math.floor(sec % 60);
-            const ms = Math.floor((sec % 1) * 100);
-            return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}.${ms.toString().padStart(2, '0')}`;
+            if (isNarrow) {
+                // Stacked neatly in top 1/9th corridor
+                octx.font = `800 ${kannadaFontSize}px 'Noto Serif Kannada', 'Tiro Kannada', serif`;
+                octx.fillText('ದಸರಾ ಹಬ್ಬದ ಶುಭಾಶಯಗಳು', width / 2, corridorCenterY - kannadaFontSize * 0.55);
+
+                octx.font = `900 ${engFontSize}px 'Cinzel', serif`;
+                octx.fillText('HAPPY DASARA', width / 2, corridorCenterY + engFontSize * 0.75);
+            } else {
+                // Elegant royal dual line in top 1/9th band
+                octx.font = `800 ${kannadaFontSize}px 'Noto Serif Kannada', 'Tiro Kannada', serif`;
+                octx.fillText('ದಸರಾ ಹಬ್ಬದ ಶುಭಾಶಯಗಳು', width / 2, corridorCenterY - kannadaFontSize * 0.48);
+
+                octx.font = `900 ${engFontSize}px 'Cinzel', serif`;
+                octx.fillText('• HAPPY DASARA •', width / 2, corridorCenterY + engFontSize * 0.72);
+            }
+
+            // Sample non-transparent pixels strictly inside the top 1/9th zone
+            const imgData = octx.getImageData(0, 0, width, Math.ceil(topFlightHeight)).data;
+            const step = isNarrow ? 3 : 4;
+
+            for (let y = 0; y < Math.floor(topFlightHeight); y += step) {
+                for (let x = Math.floor(width * 0.15); x < Math.floor(width * 0.85); x += step) {
+                    const idx = (y * width + x) * 4;
+                    if (imgData[idx + 3] > 150) {
+                        TARGET_POINTS.push({
+                            x: x,
+                            y: y,
+                            color: y > corridorCenterY ? '#00f2fe' : '#ffd700'
+                        });
+                    }
+                }
+            }
         }
 
-        // Background Stars & Sky elements
-        const STARS = [];
-        for (let i = 0; i < 180; i++) {
-            STARS.push({
-                x: Math.random(),
-                y: Math.random() * 0.85,
-                r: Math.random() * 1.5 + 0.4,
-                alpha: Math.random() * 0.8 + 0.2,
-                twinkleSpeed: Math.random() * 2 + 1
-            });
+        function initContrailsAndParticles() {
+            PARTICLES.length = 0;
+            const targetCount = TARGET_POINTS.length || 1;
+            for (let i = 0; i < MAX_PARTICLES; i++) {
+                PARTICLES.push({
+                    x: width * 0.5 + (Math.random() - 0.5) * (width * 0.6),
+                    y: Math.random() * topFlightHeight,
+                    vx: (Math.random() - 0.5) * 2.2,
+                    vy: (Math.random() - 0.5) * 2.2,
+                    targetIdx: i % targetCount,
+                    size: Math.random() * 1.8 + 0.9,
+                    color: Math.random() > 0.45 ? '#ffd700' : (Math.random() > 0.4 ? '#ff9e00' : '#00f2fe'),
+                    alpha: 0
+                });
+            }
         }
 
-        // Ambient Festive Diyas & Fireworks
-        const FIREWORKS = [];
-        function createFirework(x, y, color) {
-            const count = 35;
+        function triggerFirework(x, y, color) {
+            const count = 28;
             for (let i = 0; i < count; i++) {
                 const angle = (Math.PI * 2 * i) / count;
-                const speed = Math.random() * 2.5 + 1.2;
+                const speed = Math.random() * 2.4 + 0.8;
                 FIREWORKS.push({
                     x: x,
                     y: y,
                     vx: Math.cos(angle) * speed,
                     vy: Math.sin(angle) * speed,
                     alpha: 1,
-                    decay: Math.random() * 0.02 + 0.015,
-                    color: color || '#ffca28',
-                    size: Math.random() * 2.5 + 1.2
+                    decay: Math.random() * 0.018 + 0.012,
+                    color: color,
+                    size: Math.random() * 2.2 + 1.0
                 });
+            }
+            if (FIREWORKS.length > MAX_FIREWORKS) {
+                FIREWORKS.splice(0, FIREWORKS.length - MAX_FIREWORKS);
             }
         }
 
         function drawMysorePalaceSkyline(time) {
-            // Dark Royal Twilight gradient
+            // Majestic Royal Night Gradient
             const skyGrad = ctx.createLinearGradient(0, 0, 0, height);
-            skyGrad.addColorStop(0, '#040212');
-            skyGrad.addColorStop(0.25, '#0b0a26');
-            skyGrad.addColorStop(0.6, '#180e38');
-            skyGrad.addColorStop(0.9, '#30133c');
-            skyGrad.addColorStop(1, '#1a0822');
+            skyGrad.addColorStop(0, '#02010b');
+            skyGrad.addColorStop(0.2, '#08061f');
+            skyGrad.addColorStop(0.55, '#130a2f');
+            skyGrad.addColorStop(0.85, '#260c33');
+            skyGrad.addColorStop(1, '#13041c');
             ctx.fillStyle = skyGrad;
             ctx.fillRect(0, 0, width, height);
 
-            // Twinkling stars in the night sky
-            ctx.save();
+            // Twinkling Royal Constellations
             for (let i = 0; i < STARS.length; i++) {
                 const st = STARS[i];
-                const twinkle = Math.sin(time * st.twinkleSpeed + i) * 0.35 + 0.65;
-                ctx.fillStyle = `rgba(255, 248, 220, ${st.alpha * twinkle})`;
+                const twinkle = Math.sin(time * st.twinkleSpeed + i) * 0.4 + 0.6;
+                ctx.fillStyle = `rgba(255, 245, 215, ${st.alpha * twinkle})`;
                 ctx.beginPath();
                 ctx.arc(st.x * width, st.y * height, st.r, 0, Math.PI * 2);
                 ctx.fill();
             }
-            ctx.restore();
 
-            // Distant Mysore Chamundi Hill Silhouette
-            ctx.fillStyle = '#0a051d';
+            // Mysore Chamundi Hill Silhouette
+            ctx.fillStyle = '#080417';
             ctx.beginPath();
             ctx.moveTo(0, height);
-            ctx.lineTo(0, height * 0.82);
-            ctx.quadraticCurveTo(width * 0.25, height * 0.76, width * 0.5, height * 0.81);
-            ctx.quadraticCurveTo(width * 0.78, height * 0.86, width, height * 0.8);
+            ctx.lineTo(0, height * 0.84);
+            ctx.quadraticCurveTo(width * 0.3, height * 0.77, width * 0.55, height * 0.82);
+            ctx.quadraticCurveTo(width * 0.82, height * 0.87, width, height * 0.82);
             ctx.lineTo(width, height);
             ctx.closePath();
             ctx.fill();
 
-            // Mysore Palace Majestic Illuminated Architectural Silhouette at screen bottom
-            const palaceY = height * 0.85;
-            const palaceH = height * 0.15;
-            const pPulse = 0.85 + Math.sin(time * 3) * 0.15; // Pulse glow effect during exit & hold
+            // Mysore Palace Majestic Illumination (Bottom Section)
+            const palaceY = height * 0.86;
+            const palaceH = height * 0.14;
+            const pPulse = 0.88 + Math.sin(time * 2.8) * 0.12;
 
-            // Palace Base Glow
-            const glowGrad = ctx.createRadialGradient(width / 2, height * 0.95, 20, width / 2, height * 0.95, width * 0.6);
-            glowGrad.addColorStop(0, `rgba(255, 179, 0, ${0.35 * pPulse})`);
-            glowGrad.addColorStop(0.5, `rgba(255, 100, 0, ${0.15 * pPulse})`);
+            // Warm golden ambient illumination spread
+            const glowGrad = ctx.createRadialGradient(width / 2, height * 0.94, 20, width / 2, height * 0.94, width * 0.55);
+            glowGrad.addColorStop(0, `rgba(255, 175, 0, ${0.28 * pPulse})`);
+            glowGrad.addColorStop(0.55, `rgba(255, 80, 0, ${0.1 * pPulse})`);
             glowGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
             ctx.fillStyle = glowGrad;
             ctx.fillRect(0, height * 0.7, width, height * 0.3);
 
-            // Mysore Palace Golden Illumination Outline
+            // Palace Architectural Silhouette
             ctx.save();
             ctx.strokeStyle = `rgba(255, 215, 0, ${0.45 * pPulse})`;
             ctx.lineWidth = 1.2;
-            ctx.fillStyle = '#060312';
+            ctx.fillStyle = '#05020f';
 
             const cx = width / 2;
-            const pw = Math.min(width * 0.88, 1000);
+            const pw = Math.min(width * 0.9, 1100);
             const startX = cx - pw / 2;
             const endX = cx + pw / 2;
 
-            // Draw multi-domed palace silhouette
             ctx.beginPath();
             ctx.moveTo(0, height);
-            ctx.lineTo(0, palaceY + 30);
-            ctx.lineTo(startX, palaceY + 30);
+            ctx.lineTo(0, palaceY + 24);
+            ctx.lineTo(startX, palaceY + 24);
 
-            // Domes and Royal Arches
             const segments = 12;
             const segW = pw / segments;
 
             for (let i = 0; i <= segments; i++) {
                 const sx = startX + i * segW;
-                // Central Main Durbar Dome
                 if (i === 6) {
-                    ctx.lineTo(sx - segW * 0.4, palaceY + 10);
-                    ctx.quadraticCurveTo(sx, palaceY - palaceH * 0.9, sx + segW * 0.4, palaceY + 10);
+                    // Central Durbar Gilded Dome
+                    ctx.lineTo(sx - segW * 0.42, palaceY + 8);
+                    ctx.quadraticCurveTo(sx, palaceY - palaceH * 0.85, sx + segW * 0.42, palaceY + 8);
                 } else if (i === 3 || i === 9) {
-                    // Secondary Gilded Domes
-                    ctx.lineTo(sx - segW * 0.3, palaceY + 18);
-                    ctx.quadraticCurveTo(sx, palaceY - palaceH * 0.55, sx + segW * 0.3, palaceY + 18);
+                    // Secondary Symmetrical Domes
+                    ctx.lineTo(sx - segW * 0.3, palaceY + 14);
+                    ctx.quadraticCurveTo(sx, palaceY - palaceH * 0.52, sx + segW * 0.3, palaceY + 14);
                 } else {
-                    // Pillared pavilions & chhatris
-                    ctx.lineTo(sx - 10, palaceY + 22);
-                    ctx.lineTo(sx, palaceY + 5);
-                    ctx.lineTo(sx + 10, palaceY + 22);
+                    // Chhatris & Ornate Pillars
+                    ctx.lineTo(sx - 8, palaceY + 20);
+                    ctx.lineTo(sx, palaceY + 4);
+                    ctx.lineTo(sx + 8, palaceY + 20);
                 }
             }
 
-            ctx.lineTo(endX, palaceY + 30);
-            ctx.lineTo(width, palaceY + 30);
+            ctx.lineTo(endX, palaceY + 24);
+            ctx.lineTo(width, palaceY + 24);
             ctx.lineTo(width, height);
             ctx.closePath();
             ctx.fill();
             ctx.stroke();
 
-            // Festive Illumination string light bulbs across palace
-            const bulbCount = 48;
+            // Festive Illumination Fairy Bulbs across palace arches
+            const bulbCount = 44;
             for (let b = 0; b <= bulbCount; b++) {
                 const bx = startX + (pw / bulbCount) * b;
-                const by = palaceY + 24 + Math.sin(b * 0.8) * 4;
-                ctx.fillStyle = (b % 2 === 0) ? `rgba(255, 235, 120, ${pPulse})` : `rgba(255, 160, 40, ${pPulse})`;
+                const by = palaceY + 20 + Math.sin(b * 0.85) * 3;
+                ctx.fillStyle = (b % 2 === 0) ? `rgba(255, 238, 140, ${pPulse})` : `rgba(255, 150, 40, ${pPulse})`;
                 ctx.beginPath();
                 ctx.arc(bx, by, 1.4, 0, Math.PI * 2);
                 ctx.fill();
             }
             ctx.restore();
 
-            // Update & Render Ambient Fireworks during 0:08 - 0:20s
-            if (time > 7.5 && Math.random() < 0.05) {
-                const fxX = width * (0.15 + Math.random() * 0.7);
-                const fxY = height * (0.25 + Math.random() * 0.3);
-                const colors = ['#ffd700', '#ff8008', '#00f2fe', '#f355da', '#50e3c2'];
-                createFirework(fxX, fxY, colors[Math.floor(Math.random() * colors.length)]);
-                soundEngine.playSparkle(950);
+            // Ambient festive fireworks (especially during exit and hold 0:08s - 0:20s)
+            if (time > 7.0 && Math.random() < 0.04) {
+                const fxX = width * (0.12 + Math.random() * 0.76);
+                const fxY = height * (0.28 + Math.random() * 0.35);
+                const colors = ['#ffd700', '#ff9100', '#00e5ff', '#ff007f', '#4eecb0'];
+                triggerFirework(fxX, fxY, colors[Math.floor(Math.random() * colors.length)]);
             }
 
+            // Update & draw fireworks
             for (let f = FIREWORKS.length - 1; f >= 0; f--) {
                 const p = FIREWORKS[f];
                 p.x += p.vx;
                 p.y += p.vy;
-                p.vy += 0.03; // mild gravity
+                p.vy += 0.025; // gravity
                 p.alpha -= p.decay;
+
                 if (p.alpha <= 0) {
                     FIREWORKS.splice(f, 1);
                 } else {
@@ -579,11 +322,11 @@
             }
         }
 
-        // Elephant Vector drawing with royal adornment (Tusks, Nettipattam forehead plate, golden Howdah)
         function drawRoyalElephant(ctx, x, y, facingRight, bankAngle, scale = 1.0) {
             ctx.save();
             ctx.translate(x, y);
-            // Apply upward cruising bank angle (smooth bank tilt)
+
+            // Smooth upward cruising bank angle
             const angle = facingRight ? -bankAngle : bankAngle;
             ctx.rotate(angle);
             if (!facingRight) {
@@ -591,283 +334,193 @@
             }
             ctx.scale(scale, scale);
 
-            // Radiant Royal Aura around the carrier of Chamundeshwari
-            const aura = ctx.createRadialGradient(0, -10, 10, 0, -10, 85);
-            aura.addColorStop(0, 'rgba(255, 215, 0, 0.45)');
-            aura.addColorStop(0.5, 'rgba(255, 120, 0, 0.2)');
+            // Radiant Divine Aura around the Ambari Elephant
+            const aura = ctx.createRadialGradient(0, -6, 8, 0, -6, 68);
+            aura.addColorStop(0, 'rgba(255, 215, 0, 0.42)');
+            aura.addColorStop(0.5, 'rgba(255, 120, 0, 0.16)');
             aura.addColorStop(1, 'rgba(0, 0, 0, 0)');
             ctx.fillStyle = aura;
             ctx.beginPath();
-            ctx.arc(0, -10, 85, 0, Math.PI * 2);
+            ctx.arc(0, -6, 68, 0, Math.PI * 2);
             ctx.fill();
 
-            // 1. ELEPHANT MAIN BODY (Robust silhouette with royal sheen)
-            ctx.fillStyle = '#22232e';
+            // 1. Elephant Body & Limbs in majestic cruising stride
+            ctx.fillStyle = '#21222b';
             ctx.strokeStyle = '#e6b800';
-            ctx.lineWidth = 1.6;
+            ctx.lineWidth = 1.4;
 
-            // Hind & Fore legs running posture
             ctx.beginPath();
             // Tail
-            ctx.moveTo(-50, -5);
-            ctx.quadraticCurveTo(-65, 10, -58, 22);
+            ctx.moveTo(-42, -4);
+            ctx.quadraticCurveTo(-54, 8, -48, 18);
             // Hind Legs
-            ctx.lineTo(-44, 45);
-            ctx.lineTo(-32, 45);
-            ctx.lineTo(-28, 12);
-            ctx.lineTo(-12, 48);
-            ctx.lineTo(-2, 48);
-            ctx.lineTo(2, 10);
+            ctx.lineTo(-36, 36);
+            ctx.lineTo(-27, 36);
+            ctx.lineTo(-23, 10);
+            ctx.lineTo(-10, 39);
+            ctx.lineTo(-2, 39);
+            ctx.lineTo(2, 9);
             // Belly
-            ctx.quadraticCurveTo(15, 16, 26, 12);
-            // Front Legs (dynamic leaping/running reach)
-            ctx.lineTo(38, 46);
-            ctx.lineTo(49, 44);
-            ctx.lineTo(42, 5);
-            ctx.lineTo(54, 40);
-            ctx.lineTo(65, 38);
+            ctx.quadraticCurveTo(12, 14, 21, 10);
+            // Front Legs
+            ctx.lineTo(31, 38);
+            ctx.lineTo(40, 36);
+            ctx.lineTo(35, 5);
+            ctx.lineTo(44, 32);
+            ctx.lineTo(53, 30);
             // Chest & Neck
-            ctx.lineTo(60, -12);
-            // Trunk (curled upward in victorious salute)
-            ctx.quadraticCurveTo(75, -5, 85, 12);
-            ctx.quadraticCurveTo(94, 25, 96, 15);
-            ctx.quadraticCurveTo(90, -15, 78, -32);
-            // Forehead & Temple Dome
-            ctx.quadraticCurveTo(62, -50, 42, -45);
-            // Crown back
-            ctx.quadraticCurveTo(0, -48, -50, -5);
+            ctx.lineTo(49, -10);
+            // Curled Trunk in Royal Salutation
+            ctx.quadraticCurveTo(62, -4, 70, 10);
+            ctx.quadraticCurveTo(77, 20, 78, 12);
+            ctx.quadraticCurveTo(73, -12, 63, -26);
+            // Forehead & Cranial Dome
+            ctx.quadraticCurveTo(50, -40, 34, -36);
+            // Back
+            ctx.quadraticCurveTo(0, -39, -42, -4);
             ctx.closePath();
             ctx.fill();
             ctx.stroke();
 
-            // 2. GOLDEN TUSKS (Proud Mysore Tusker)
-            ctx.fillStyle = '#fffff0';
-            ctx.shadowColor = '#ffe066';
-            ctx.shadowBlur = 8;
+            // 2. Mysore Tusks (Golden Cap Ivory)
+            ctx.fillStyle = '#fffff2';
+            ctx.shadowColor = '#ffd700';
+            ctx.shadowBlur = 6;
             ctx.beginPath();
-            ctx.moveTo(68, -10);
-            ctx.quadraticCurveTo(86, -6, 92, -26);
-            ctx.quadraticCurveTo(84, -12, 66, -3);
+            ctx.moveTo(55, -8);
+            ctx.quadraticCurveTo(70, -5, 75, -21);
+            ctx.quadraticCurveTo(68, -10, 53, -2);
             ctx.closePath();
             ctx.fill();
             ctx.shadowBlur = 0;
 
-            // 3. ROYAL CAPARISON (Jhul / Jhool - Decorated velvet body blanket)
-            const jhulGrad = ctx.createLinearGradient(-35, -20, 25, 15);
+            // 3. Decorated Royal Blanket (Jhul / Jhool)
+            const jhulGrad = ctx.createLinearGradient(-28, -20, 20, 12);
             jhulGrad.addColorStop(0, '#c70039');
             jhulGrad.addColorStop(0.5, '#900c3f');
             jhulGrad.addColorStop(1, '#ff5733');
             ctx.fillStyle = jhulGrad;
             ctx.strokeStyle = '#ffd700';
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 1.8;
 
             ctx.beginPath();
-            ctx.moveTo(-35, -28);
-            ctx.quadraticCurveTo(0, -32, 35, -26);
-            ctx.lineTo(30, 8);
-            ctx.quadraticCurveTo(0, 16, -30, 8);
+            ctx.moveTo(-28, -23);
+            ctx.quadraticCurveTo(0, -26, 28, -21);
+            ctx.lineTo(24, 6);
+            ctx.quadraticCurveTo(0, 13, -24, 6);
             ctx.closePath();
             ctx.fill();
             ctx.stroke();
 
-            // Golden tassels on blanket
+            // Gilded fringe beads
             ctx.fillStyle = '#ffd700';
-            for (let t = -24; t <= 24; t += 8) {
+            for (let t = -19; t <= 19; t += 6.5) {
                 ctx.beginPath();
-                ctx.arc(t, 9 + Math.sin(t * 0.3) * 2, 2, 0, Math.PI * 2);
+                ctx.arc(t, 7 + Math.sin(t * 0.35) * 1.5, 1.6, 0, Math.PI * 2);
                 ctx.fill();
             }
 
-            // 4. NETTIPATTAM (Golden Forehead Ornament / Crown Mask)
+            // 4. Nettipattam (Golden Forehead Armor)
             ctx.fillStyle = '#ffd700';
             ctx.beginPath();
-            ctx.moveTo(56, -42);
-            ctx.lineTo(68, -25);
-            ctx.lineTo(58, -12);
-            ctx.lineTo(46, -26);
+            ctx.moveTo(45, -34);
+            ctx.lineTo(55, -20);
+            ctx.lineTo(47, -10);
+            ctx.lineTo(37, -21);
             ctx.closePath();
             ctx.fill();
             ctx.strokeStyle = '#fff8b3';
-            ctx.lineWidth = 1;
+            ctx.lineWidth = 0.8;
             ctx.stroke();
 
-            // 5. GOLDEN AMBARI / HOWDAH (The 750kg Golden Carriage of Mysuru)
-            const howdahGrad = ctx.createLinearGradient(-15, -60, 15, -30);
-            howdahGrad.addColorStop(0, '#ffe066');
+            // 5. Mysuru Golden Ambari / Howdah
+            const howdahGrad = ctx.createLinearGradient(-12, -48, 12, -24);
+            howdahGrad.addColorStop(0, '#fff099');
             howdahGrad.addColorStop(0.5, '#ffb703');
             howdahGrad.addColorStop(1, '#fb8500');
             ctx.fillStyle = howdahGrad;
             ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 1.2;
+            ctx.lineWidth = 1.0;
 
-            // Howdah Throne Pavilion
             ctx.beginPath();
-            ctx.moveTo(-18, -32);
-            ctx.lineTo(-22, -54);
-            ctx.lineTo(0, -66); // Peak Kalasha
-            ctx.lineTo(22, -54);
-            ctx.lineTo(18, -32);
+            ctx.moveTo(-15, -26);
+            ctx.lineTo(-18, -44);
+            ctx.lineTo(0, -54); // Kalasha peak
+            ctx.lineTo(18, -44);
+            ctx.lineTo(15, -26);
             ctx.closePath();
             ctx.fill();
             ctx.stroke();
 
-            // Golden Kalasha finial on top of Howdah
+            // Howdah Kalasha Finial Dome
             ctx.beginPath();
-            ctx.arc(0, -68, 3.5, 0, Math.PI * 2);
-            ctx.fillStyle = '#fffdf0';
-            ctx.fill();
-
-            // Glowing jewels on howdah
-            ctx.fillStyle = '#00f2fe';
-            ctx.beginPath();
-            ctx.arc(0, -48, 2.8, 0, Math.PI * 2);
+            ctx.arc(0, -55.5, 2.8, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffffff';
             ctx.fill();
 
             ctx.restore();
         }
 
-        // We will sample pixels from offscreen canvas for:
-        // Line 1: "ದಸರಾ ಹಬ್ಬದ ಶುಭಾಶಯಗಳು"
-        // Line 2: "HAPPY DASARA"
-        const TARGET_POINTS = [];
-        const PARTICLES = [];
-        const MAX_PARTICLES = 1600;
-
-        function sampleTargetTextPoints() {
-            TARGET_POINTS.length = 0;
-            const off = document.createElement('canvas');
-            off.width = width;
-            off.height = height;
-            const octx = off.getContext('2d');
-
-            octx.clearRect(0, 0, width, height);
-            octx.textAlign = 'center';
-            octx.textBaseline = 'middle';
-
-            // Kannada Line Size & Position (Center Stage)
-            const kannadaFontSize = Math.min(Math.max(width * 0.055, 26), 56);
-            octx.font = `800 ${kannadaFontSize}px 'Noto Serif Kannada', 'Tiro Kannada', serif`;
-            octx.fillStyle = '#ffffff';
-            const kY = height * 0.44;
-            octx.fillText('ದಸರಾ ಹಬ್ಬದ ಶುಭಾಶಯಗಳು', width / 2, kY);
-
-            // English Line Size & Position
-            const engFontSize = Math.min(Math.max(width * 0.046, 22), 48);
-            octx.font = `900 ${engFontSize}px 'Cinzel', serif`;
-            const eY = kY + kannadaFontSize * 1.35;
-            octx.fillText('HAPPY DASARA', width / 2, eY);
-
-            // Subtitle Mysore royal tagline
-            const subFontSize = Math.min(Math.max(width * 0.016, 12), 16);
-            octx.font = `600 ${subFontSize}px 'Inter', sans-serif`;
-            octx.fillText('ನಾದಹಬ್ಬ ಮೈಸೂರು ದಸರಾ ಮಹೋತ್ಸವ', width / 2, eY + engFontSize * 1.05);
-
-            // Sample non-transparent pixels with step size adapted to screen
-            const imgData = octx.getImageData(0, 0, width, height).data;
-            const step = (width < 768) ? 4 : 5;
-
-            for (let y = Math.floor(height * 0.32); y < Math.floor(height * 0.72); y += step) {
-                for (let x = Math.floor(width * 0.05); x < Math.floor(width * 0.95); x += step) {
-                    const idx = (y * width + x) * 4;
-                    if (imgData[idx + 3] > 140) {
-                        TARGET_POINTS.push({
-                            x: x,
-                            y: y,
-                            color: y > kY + 20 ? '#00e5ff' : '#ffd700', // Gold for Kannada, Cyan/Gold for English
-                            alpha: 1.0
-                        });
-                    }
-                }
-            }
-        }
-
-        // Initialize particles that will spawn from elephant contrails and consolidate
-        function initContrailsAndParticles() {
-            PARTICLES.length = 0;
-            for (let i = 0; i < MAX_PARTICLES; i++) {
-                PARTICLES.push({
-                    x: Math.random() * width,
-                    y: Math.random() * topFlightHeight,
-                    vx: (Math.random() - 0.5) * 3,
-                    vy: (Math.random() - 0.5) * 3,
-                    targetIdx: i % (TARGET_POINTS.length || 1),
-                    size: Math.random() * 2.2 + 1.2,
-                    color: Math.random() > 0.4 ? '#ffd700' : (Math.random() > 0.5 ? '#ff9100' : '#00e5ff'),
-                    alpha: 0,
-                    trailHistory: []
-                });
-            }
-        }
-
-        // Elephant trajectory calculation
         function getElephantState(time) {
-            // Screen boundaries & flight parameters
-            // Flight Corridor is strictly top 1/9th: y is bounded between height * 0.02 and topFlightHeight * 0.88
-            const startY = topFlightHeight * 0.75;
-            const cruisingY = topFlightHeight * 0.42;
-
-            // Banked upward cruising angle: slight negative slope (moving upward as they travel inward)
-            // Bank angle in radians (~6 degrees)
-            const bankAngle = 0.105;
-
-            // Elephant 1: Starts from Left (-120), enters, cruises to right
-            // Elephant 2: Starts from Right (width + 120), enters, cruises to left
+            // Strictly locked to the top 1/9th corridor
+            // Banked upward cruising angle (~5.7 degrees)
+            const bankAngle = 0.098;
+            const startY = topFlightHeight * 0.68;
+            const cruisingY = corridorCenterY;
 
             let leftX, rightX, leftY, rightY, leftVisible, rightVisible;
 
             if (time <= 2.0) {
                 // Phase 1: 0:00 – 0:02s (Entry)
-                // Smooth easeOutCubic entering top 1/9th
+                // Both enter from opposite ends into top 1/9th zone
                 const prog = Math.min(time / 2.0, 1.0);
                 const ease = 1 - Math.pow(1 - prog, 3);
 
-                leftX = -120 + (width * 0.38 + 120) * ease;
-                rightX = (width + 120) - (width * 0.38 + 120) * ease;
+                leftX = -120 + (width * 0.22 + 120) * ease;
+                rightX = (width + 120) - (width * 0.22 + 120) * ease;
 
-                // Banked upward cruising glide
                 leftY = startY - (startY - cruisingY) * ease;
                 rightY = startY - (startY - cruisingY) * ease;
                 leftVisible = true;
                 rightVisible = true;
             } else if (time <= 5.5) {
                 // Phase 2: 0:02 – 0:05.5s (The Trail)
-                // Continuing horizontal cruising crossing paths
+                // Cruise inward toward their flanking positions framing the center text
                 const prog = (time - 2.0) / 3.5;
-                leftX = width * 0.38 + (width * 0.28) * prog;
-                rightX = width * 0.62 - (width * 0.28) * prog;
+                leftX = width * 0.22 + (width * 0.08) * prog;
+                rightX = width * 0.78 - (width * 0.08) * prog;
 
-                // Gentle royal sinusoidal wave while cruising
-                leftY = cruisingY + Math.sin(time * 3) * 5;
-                rightY = cruisingY + Math.cos(time * 3) * 5;
+                leftY = cruisingY + Math.sin(time * 2.8) * 3.5;
+                rightY = cruisingY + Math.cos(time * 2.8) * 3.5;
                 leftVisible = true;
                 rightVisible = true;
             } else if (time <= 9.5) {
                 // Phase 3: 0:05.5 – 0:09.5s (Typography Reveal)
-                // Elephants proceed across frame preparing for exit
+                // Elephants majestic steady cruise framing the revealed text between them
                 const prog = (time - 5.5) / 4.0;
-                leftX = width * 0.66 + (width * 0.22) * prog;
-                rightX = width * 0.34 - (width * 0.22) * prog;
+                leftX = width * 0.30 + (width * 0.06) * prog;
+                rightX = width * 0.70 - (width * 0.06) * prog;
 
-                leftY = cruisingY + Math.sin(time * 2.5) * 4;
-                rightY = cruisingY + Math.cos(time * 2.5) * 4;
+                leftY = cruisingY + Math.sin(time * 2.2) * 3.0;
+                rightY = cruisingY + Math.cos(time * 2.2) * 3.0;
                 leftVisible = true;
                 rightVisible = true;
             } else if (time <= 11.5) {
                 // Phase 4: 0:09.5 – 0:20s (Exit & Hold)
-                // The elephants exit off opposite sides within the initial 2.0s of this phase (0:09.5 - 0:11.5s)
+                // Elephants exit to opposite edges within the initial 2.0s of this phase (0:09.5 - 0:11.5s)
                 const exitProg = (time - 9.5) / 2.0;
-                const exitEase = Math.pow(exitProg, 2); // Accelerate off-screen
+                const exitEase = Math.pow(exitProg, 2.2);
 
-                leftX = width * 0.88 + (width * 0.25 + 150) * exitEase;
-                rightX = width * 0.12 - (width * 0.25 + 150) * exitEase;
+                leftX = width * 0.36 + (width * 0.64 + 180) * exitEase;
+                rightX = width * 0.64 - (width * 0.64 + 180) * exitEase;
 
-                leftY = cruisingY - 10 * exitProg;
-                rightY = cruisingY - 10 * exitProg;
+                leftY = cruisingY - 8 * exitProg;
+                rightY = cruisingY - 8 * exitProg;
 
                 leftVisible = leftX < width + 140;
                 rightVisible = rightX > -140;
             } else {
-                // 11.5s - 20s: Elephants exited off-screen
+                // 11.5s - 20s: Elephants exited off-screen; typography locks & pulses
                 leftVisible = false;
                 rightVisible = false;
                 leftX = width + 500;
@@ -883,35 +536,30 @@
             };
         }
 
-        // Contrail Ribbon History Buffer
-        const leftContrailHistory = [];
-        const rightContrailHistory = [];
-
         function drawNeonContrail(history, primaryColor, secondaryColor) {
             if (history.length < 2) return;
 
             ctx.save();
-            // Outer High-Energy Bloom
             ctx.shadowColor = primaryColor;
-            ctx.shadowBlur = 18;
+            ctx.shadowBlur = 14;
 
-            // Render ribbon with fading width and alpha
+            // Outer vibrant radiant streak
             for (let i = 1; i < history.length; i++) {
                 const p0 = history[i - 1];
                 const p1 = history[i];
-                const progress = i / history.length; // 0 (tail end) to 1 (near elephant)
+                const progress = i / history.length;
 
                 ctx.beginPath();
                 ctx.moveTo(p0.x, p0.y);
                 ctx.lineTo(p1.x, p1.y);
-                ctx.strokeStyle = progress > 0.6 ? primaryColor : secondaryColor;
-                ctx.globalAlpha = Math.min(progress * 1.2, 0.9);
-                ctx.lineWidth = progress * 7 + 1.2;
+                ctx.strokeStyle = progress > 0.5 ? primaryColor : secondaryColor;
+                ctx.globalAlpha = Math.min(progress * 1.15, 0.85);
+                ctx.lineWidth = progress * 5.5 + 1.0;
                 ctx.lineCap = 'round';
                 ctx.stroke();
             }
 
-            // High-voltage inner core
+            // High-intensity white inner core
             ctx.beginPath();
             for (let i = 0; i < history.length; i++) {
                 const pt = history[i];
@@ -919,141 +567,143 @@
                 else ctx.lineTo(pt.x, pt.y);
             }
             ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 2.2;
-            ctx.globalAlpha = 0.85;
+            ctx.lineWidth = 1.6;
+            ctx.globalAlpha = 0.8;
             ctx.stroke();
 
             ctx.restore();
         }
 
-        // Draw Consolidated Glowing Typography Vector & Particles
-        function renderTypographyAndParticles(time) {
-            // Reveal Phase: 0:05.5 – 0:09.5s (Consolidation)
-            // Hold Phase: 0:09.5 – 0:20s (Glow & Pulse Lock)
-            if (time < 2.0) return;
+        function renderTypographyAndParticles(time, elephantState) {
+            if (time < 1.8) return;
 
+            // Calculate consolidation amount
             let consolidation = 0;
-            if (time >= 2.0 && time < 5.5) {
-                // Beginning to scatter luminous embers in sky
-                consolidation = 0.05 * ((time - 2.0) / 3.5);
+            if (time >= 1.8 && time < 5.5) {
+                // Contrail particles gather between the two elephants
+                consolidation = 0.08 * ((time - 1.8) / 3.7);
             } else if (time >= 5.5 && time < 9.5) {
-                // Dramatic Coalescing into crisp vector typography
+                // Sharp magnetic snapping into the typography
                 const prog = (time - 5.5) / 4.0;
-                // Cubic ease for dramatic magnetic snap
-                consolidation = Math.min(Math.pow(prog, 2) * 1.1, 1.0);
+                consolidation = Math.min(Math.pow(prog, 1.8) * 1.05, 1.0);
             } else {
-                // Fully consolidated & holding
+                // Locked into place and holding gently
                 consolidation = 1.0;
             }
 
             const targetCount = TARGET_POINTS.length;
             if (targetCount === 0) return;
 
-            // Render Active Swarm Particles
+            // Particle Swarm
             ctx.save();
             for (let i = 0; i < PARTICLES.length; i++) {
                 const p = PARTICLES[i];
                 const target = TARGET_POINTS[p.targetIdx % targetCount];
 
                 if (time < 5.5) {
-                    // Passive glowing contrail embers
-                    p.alpha = Math.min(p.alpha + 0.02, 0.7);
+                    p.alpha = Math.min(p.alpha + 0.02, 0.65);
                     p.x += p.vx;
                     p.y += p.vy;
-                    // Wrap inside top cruising area
+
+                    // Restrict particle dispersal within top 1/9th zone
                     if (p.x < 0) p.x = width;
                     if (p.x > width) p.x = 0;
-                    if (p.y > topFlightHeight * 1.5) p.y = topFlightHeight * 0.2;
+                    if (p.y > topFlightHeight) p.y = topFlightHeight * 0.1;
+                    if (p.y < 0) p.y = topFlightHeight * 0.9;
                 } else if (time >= 5.5 && time < 9.5) {
-                    // Magnetic Attraction to Lettering Vectors
-                    p.alpha = Math.min(p.alpha + 0.03, 1.0);
+                    p.alpha = Math.min(p.alpha + 0.03, 0.95);
                     const dx = target.x - p.x;
                     const dy = target.y - p.y;
-                    p.x += dx * (0.07 + consolidation * 0.12);
-                    p.y += dy * (0.07 + consolidation * 0.12);
+                    p.x += dx * (0.08 + consolidation * 0.12);
+                    p.y += dy * (0.08 + consolidation * 0.12);
                 } else {
-                    // Hold locked with subtle harmonic breathing
-                    p.alpha = 0.95;
-                    const breathe = Math.sin(time * 2.5 + i * 0.05) * 1.2;
-                    p.x = target.x + breathe * 0.3;
-                    p.y = target.y + breathe * 0.3;
+                    p.alpha = 0.92;
+                    const breathe = Math.sin(time * 2.8 + i * 0.08) * 0.8;
+                    p.x = target.x + breathe * 0.25;
+                    p.y = target.y + breathe * 0.25;
                 }
 
-                // Render particle dot
                 ctx.fillStyle = p.color;
                 ctx.globalAlpha = p.alpha;
                 ctx.shadowColor = p.color;
-                ctx.shadowBlur = 8 * consolidation;
+                ctx.shadowBlur = 6 * consolidation;
                 ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size * (1 - consolidation * 0.35), 0, Math.PI * 2);
+                ctx.arc(p.x, p.y, p.size * (1 - consolidation * 0.3), 0, Math.PI * 2);
                 ctx.fill();
             }
             ctx.restore();
 
-            // When consolidation surpasses 65%, overlay the sharp crisp vector typography
-            if (consolidation > 0.45) {
-                const textAlpha = Math.min((consolidation - 0.45) / 0.55, 1.0);
-                const pulseGlow = (time >= 9.5) ? (16 + Math.sin(time * 3) * 6) : 14;
+            // Crisp vector lettering between the two elephants
+            if (consolidation > 0.4) {
+                const textAlpha = Math.min((consolidation - 0.4) / 0.6, 1.0);
+                const pulseGlow = (time >= 9.5) ? (14 + Math.sin(time * 3.0) * 5) : 12;
 
                 ctx.save();
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
-                // Golden Glowing Neon Bloom
+                const isNarrow = width < 768;
+                const kannadaFontSize = Math.min(Math.max(topFlightHeight * (isNarrow ? 0.32 : 0.36), 13), 28);
+                const engFontSize = Math.min(Math.max(topFlightHeight * (isNarrow ? 0.24 : 0.26), 10), 20);
+
+                // Golden Glow Backdrop
                 ctx.shadowColor = '#ffb700';
                 ctx.shadowBlur = pulseGlow;
 
-                // Kannada Typography: "ದಸರಾ ಹಬ್ಬದ ಶುಭಾಶಯಗಳು"
-                const kannadaFontSize = Math.min(Math.max(width * 0.055, 26), 56);
-                ctx.font = `800 ${kannadaFontSize}px 'Noto Serif Kannada', 'Tiro Kannada', serif`;
-
-                const kY = height * 0.44;
-
-                // Outer Gold Shimmer Fill
-                const goldGrad = ctx.createLinearGradient(width * 0.2, kY - 30, width * 0.8, kY + 30);
+                // Gold Foil Gradient
+                const goldGrad = ctx.createLinearGradient(width * 0.25, corridorCenterY - 20, width * 0.75, corridorCenterY + 20);
                 goldGrad.addColorStop(0, '#fffbe6');
                 goldGrad.addColorStop(0.3, '#ffd700');
-                goldGrad.addColorStop(0.7, '#ff9100');
-                goldGrad.addColorStop(1, '#ffea75');
+                goldGrad.addColorStop(0.7, '#ff9900');
+                goldGrad.addColorStop(1, '#ffeb7a');
 
                 ctx.fillStyle = goldGrad;
                 ctx.globalAlpha = textAlpha;
-                ctx.fillText('ದಸರಾ ಹಬ್ಬದ ಶುಭಾಶಯಗಳು', width / 2, kY);
 
-                // English Typography: "HAPPY DASARA"
-                const engFontSize = Math.min(Math.max(width * 0.046, 22), 48);
-                ctx.font = `900 ${engFontSize}px 'Cinzel', serif`;
-                const eY = kY + kannadaFontSize * 1.35;
+                if (isNarrow) {
+                    // Line 1: Kannada
+                    ctx.font = `800 ${kannadaFontSize}px 'Noto Serif Kannada', 'Tiro Kannada', serif`;
+                    ctx.fillText('ದಸರಾ ಹಬ್ಬದ ಶುಭಾಶಯಗಳು', width / 2, corridorCenterY - kannadaFontSize * 0.55);
 
-                const cyanGoldGrad = ctx.createLinearGradient(width * 0.3, eY - 20, width * 0.7, eY + 20);
-                cyanGoldGrad.addColorStop(0, '#e0f7fa');
-                cyanGoldGrad.addColorStop(0.4, '#00e5ff');
-                cyanGoldGrad.addColorStop(0.7, '#ffd700');
-                cyanGoldGrad.addColorStop(1, '#ffffff');
+                    // Line 2: English
+                    const cyanGrad = ctx.createLinearGradient(width * 0.3, corridorCenterY + 5, width * 0.7, corridorCenterY + 25);
+                    cyanGrad.addColorStop(0, '#e0f7fa');
+                    cyanGrad.addColorStop(0.5, '#00e5ff');
+                    cyanGrad.addColorStop(1, '#ffd700');
 
-                ctx.shadowColor = '#00e5ff';
-                ctx.shadowBlur = pulseGlow * 0.8;
-                ctx.fillStyle = cyanGoldGrad;
-                ctx.fillText('HAPPY DASARA', width / 2, eY);
+                    ctx.shadowColor = '#00e5ff';
+                    ctx.shadowBlur = pulseGlow * 0.7;
+                    ctx.fillStyle = cyanGrad;
+                    ctx.font = `900 ${engFontSize}px 'Cinzel', serif`;
+                    ctx.fillText('HAPPY DASARA', width / 2, corridorCenterY + engFontSize * 0.75);
+                } else {
+                    // Line 1: Kannada (Golden Bloom)
+                    ctx.font = `800 ${kannadaFontSize}px 'Noto Serif Kannada', 'Tiro Kannada', serif`;
+                    ctx.fillText('ದಸರಾ ಹಬ್ಬದ ಶುಭಾಶಯಗಳು', width / 2, corridorCenterY - kannadaFontSize * 0.48);
 
-                // Mysore Cultural Heritage Tagline
-                const subFontSize = Math.min(Math.max(width * 0.016, 12), 16);
-                ctx.font = `600 ${subFontSize}px 'Inter', sans-serif`;
-                ctx.shadowBlur = 4;
-                ctx.shadowColor = '#ffaa00';
-                ctx.fillStyle = '#ffeed6';
-                ctx.fillText('ನಾದಹಬ್ಬ ಮೈಸೂರು ದಸರಾ ಮಹೋತ್ಸವ • MYSORE DASARA CELEBRATION', width / 2, eY + engFontSize * 1.05);
+                    // Line 2: English Festive
+                    const cyanGrad = ctx.createLinearGradient(width * 0.3, corridorCenterY + 2, width * 0.7, corridorCenterY + 22);
+                    cyanGrad.addColorStop(0, '#e0f7fa');
+                    cyanGrad.addColorStop(0.5, '#00e5ff');
+                    cyanGrad.addColorStop(1, '#ffd700');
 
-                // Vector Ornamental Flourish Divider under the typography
-                const lineW = Math.min(width * 0.55, 500);
-                const lineY = eY + engFontSize * 1.45;
+                    ctx.shadowColor = '#00e5ff';
+                    ctx.shadowBlur = pulseGlow * 0.7;
+                    ctx.fillStyle = cyanGrad;
+                    ctx.font = `900 ${engFontSize}px 'Cinzel', serif`;
+                    ctx.fillText('• HAPPY DASARA •', width / 2, corridorCenterY + engFontSize * 0.72);
+                }
+
+                // Ornate underline flourish centered between elephants
+                const lineW = Math.min(width * 0.38, 380);
+                const lineY = isNarrow ? corridorCenterY + engFontSize * 1.5 : corridorCenterY + engFontSize * 1.35;
                 ctx.strokeStyle = 'rgba(255, 215, 0, 0.5)';
-                ctx.lineWidth = 1.5;
+                ctx.lineWidth = 1.2;
                 ctx.beginPath();
                 ctx.moveTo(width / 2 - lineW / 2, lineY);
-                ctx.lineTo(width / 2 - 25, lineY);
-                ctx.arc(width / 2, lineY, 4, 0, Math.PI * 2);
-                ctx.moveTo(width / 2 + 25, lineY);
+                ctx.lineTo(width / 2 - 16, lineY);
+                ctx.arc(width / 2, lineY, 2.5, 0, Math.PI * 2);
+                ctx.moveTo(width / 2 + 16, lineY);
                 ctx.lineTo(width / 2 + lineW / 2, lineY);
                 ctx.stroke();
 
@@ -1061,133 +711,87 @@
             }
         }
 
-        function updateUI() {
-            scrubber.value = currentTime.toFixed(2);
-            timecodeDisplay.textContent = formatTimecode(currentTime);
+        let lastTimestamp = null;
+        let elapsedLoopTime = 0; // Ranges continuously from 0 to 20 seconds
 
-            // Phase Badge Text Updates based on specs
-            if (currentTime < 2.0) {
-                phaseBadge.className = "inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel text-xs md:text-sm font-semibold tracking-wide text-amber-300 border border-amber-400/50 shadow-lg shadow-amber-500/20";
-                phaseText.textContent = "0:00 – 0:02s Entry (Top 1/9th Cruising Angle)";
-            } else if (currentTime < 5.5) {
-                phaseBadge.className = "inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel text-xs md:text-sm font-semibold tracking-wide text-cyan-300 border border-cyan-400/50 shadow-lg shadow-cyan-500/20";
-                phaseText.textContent = "0:02 – 0:05.5s The Trail (High-Energy Neon Contrails)";
-            } else if (currentTime < 9.5) {
-                phaseBadge.className = "inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel text-xs md:text-sm font-semibold tracking-wide text-yellow-300 border border-yellow-400/50 shadow-lg shadow-yellow-500/20";
-                phaseText.textContent = "0:05.5 – 0:09.5s Typography Reveal (Particle Consolidation)";
-            } else {
-                phaseBadge.className = "inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel text-xs md:text-sm font-semibold tracking-wide text-emerald-300 border border-emerald-400/50 shadow-lg shadow-emerald-500/20";
-                phaseText.textContent = "0:09.5 – 0:20s Exit & Hold (Elephants Exit, Mysore Skyline Pulse)";
-            }
-
-            speedIndicator.textContent = `Y-Limit: ${(topFlightHeight).toFixed(0)}px (H/9)`;
-        }
-
-        // Sound triggers per timeline milestones
-        let prevSec = 0;
-        function handleAudioCues(time) {
-            const currentFloorSec = Math.floor(time);
-            if (currentFloorSec !== prevSec) {
-                if (currentFloorSec === 0) soundEngine.playRoyalRumble();
-                if (currentFloorSec === 2) soundEngine.playTempleChime(520);
-                if (currentFloorSec === 5) soundEngine.playTempleChime(680);
-                if (currentFloorSec === 9) soundEngine.playTempleChime(440);
-                if (currentFloorSec >= 10 && currentFloorSec % 3 === 0) soundEngine.playSparkle(800 + Math.random() * 300);
-                prevSec = currentFloorSec;
-            }
-        }
-
-        // Main 60 FPS Animation Frame Loop
         function animationLoop(timestamp) {
-            if (!lastFrameTimestamp) lastFrameTimestamp = timestamp;
-            const dt = (timestamp - lastFrameTimestamp) / 1000;
-            lastFrameTimestamp = timestamp;
+            if (!lastTimestamp) lastTimestamp = timestamp;
+            const delta = (timestamp - lastTimestamp) / 1000;
+            lastTimestamp = timestamp;
 
-            if (isPlaying) {
-                currentTime += dt;
-                if (currentTime >= DURATION) {
-                    currentTime = DURATION;
-                    setPlayState(false);
-                }
+            // Advance time and smoothly loop back to 0 at 20.0s for whole-day 24/7 playback
+            const prevTime = elapsedLoopTime;
+            elapsedLoopTime = (elapsedLoopTime + delta) % DURATION;
+
+            // Handle loop wrap-around event
+            if (elapsedLoopTime < prevTime) {
+                leftContrailHistory.length = 0;
+                rightContrailHistory.length = 0;
+                initContrailsAndParticles();
             }
 
-            updateUI();
-            handleAudioCues(currentTime);
+            const currentTime = elapsedLoopTime;
 
-            // Clear Screen
+            // 1. Clear frame
             ctx.clearRect(0, 0, width, height);
 
-            // 1. Draw Royal Night Backdrop & Mysore Palace
+            // 2. Render Mysore Skyline, Starry Sky & Palace Illumination
             drawMysorePalaceSkyline(currentTime);
 
-            // 2. Compute Elephant kinematics
+            // 3. Compute elephant positions strictly inside the top 1/9th corridor
             const state = getElephantState(currentTime);
 
-            // Update Contrail Buffers
+            // 4. Update Contrail points from tail emitters
             if (currentTime >= 0.2 && currentTime <= 11.5) {
-                // Elephant 1 (Left to Right) Tail emitter
                 if (state.leftVisible) {
                     leftContrailHistory.push({
-                        x: state.leftX - 45,
-                        y: state.leftY - 4
+                        x: state.leftX - 35,
+                        y: state.leftY - 3
                     });
                 }
-                // Elephant 2 (Right to Left) Tail emitter
                 if (state.rightVisible) {
                     rightContrailHistory.push({
-                        x: state.rightX + 45,
-                        y: state.rightY - 4
+                        x: state.rightX + 35,
+                        y: state.rightY - 3
                     });
                 }
 
-                // Keep maximum trail length for high energy ribbon
-                const maxHistory = (currentTime < 5.5) ? 75 : 45;
+                const maxHistory = (currentTime < 5.5) ? 65 : 40;
                 if (leftContrailHistory.length > maxHistory) leftContrailHistory.shift();
                 if (rightContrailHistory.length > maxHistory) rightContrailHistory.shift();
-
-                // Play contrail audio sparkle periodically
-                if (Math.random() < 0.25 && currentTime > 2.0 && currentTime < 6.0) {
-                    soundEngine.playSparkle(1100);
-                }
             } else {
-                // Fade out contrail tails after elephants leave
                 if (leftContrailHistory.length > 0) leftContrailHistory.shift();
                 if (rightContrailHistory.length > 0) rightContrailHistory.shift();
             }
 
-            // 3. Render High-Energy Neon Contrails (0:02 - 0:05.5s & beyond)
+            // 5. Draw Glowing Neon Contrails
             if (currentTime >= 0.5) {
-                drawNeonContrail(leftContrailHistory, '#ffd700', '#ff8008'); // Golden Amber energy
-                drawNeonContrail(rightContrailHistory, '#00f2fe', '#4facfe'); // Cyan electric energy
+                drawNeonContrail(leftContrailHistory, '#ffd700', '#ff8500'); // Golden streak
+                drawNeonContrail(rightContrailHistory, '#00e5ff', '#3a7bd5'); // Cyan streak
             }
 
-            // 4. Render Particle System & Typography Consolidation (0:05.5 – 0:20s)
-            renderTypographyAndParticles(currentTime);
+            // 6. Draw Typography & Particles directly between the two elephants in top 1/9th zone
+            renderTypographyAndParticles(currentTime, state);
 
-            // 5. Render Royal Elephants (Cruising in Top 1/9th)
-            const elephantScale = Math.min(Math.max(width * 0.00075, 0.65), 1.15);
+            // 7. Render Royal Elephants (scaled proportionally to fit the top 1/9th band)
+            const elephantScale = Math.min(Math.max((topFlightHeight / 115), 0.48), 0.88);
 
-            // Left Elephant (facing right)
+            // Left Elephant cruising rightward
             if (state.leftVisible) {
                 drawRoyalElephant(ctx, state.leftX, state.leftY, true, state.bankAngle, elephantScale);
             }
 
-            // Right Elephant (facing left)
+            // Right Elephant cruising leftward
             if (state.rightVisible) {
                 drawRoyalElephant(ctx, state.rightX, state.rightY, false, state.bankAngle, elephantScale);
             }
 
-            // Continue animation if playing or scrubbed
-            if (isPlaying || currentTime < DURATION) {
-                requestAnimationFrame(animationLoop);
-            }
+            requestAnimationFrame(animationLoop);
         }
 
         window.onload = function() {
             resize();
-            initContrailsAndParticles();
-            updateUI();
-            setPlayState(true);
+            requestAnimationFrame(animationLoop);
         };
     </script>
 </body>
