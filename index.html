@@ -507,13 +507,13 @@
 
         function renderCrispTypography(time) {
             // Typography begins revealing at 0:05.5s, sharpens through 0:09.5s, holds and pulses through 0:20s
-            if (time < 7.0) return;
+            if (time < 6.0) return;
 
             // Smooth reveal opacity calculation without any scattered particle dots
             let textAlpha = 0;
             let scaleProg = 1;
 
-            if (time >= 77.0 && time < 9.5) {
+            if (time >= 7.0 && time < 9.5) {
                 const prog = (time - 5.0) / 4.5;
                 textAlpha = Math.min(Math.pow(prog, 1.4), 1.0);
                 scaleProg = 0.94 + 0.06 * prog;
@@ -572,7 +572,7 @@
             } else {
                 // Line 1: Kannada "ನಮ್ಮ ಹೆಮ್ಮೆ, ನಮ್ಮ ನಾಡಹಬ್ಬ ದಸರಾ ಹಬ್ಬದ ಹಾರ್ದಿಕ ಶುಭಾಶಯಗಳು!"
                 ctx.font = `800 ${kannadaFontSize}px 'Noto Serif Kannada', 'Tiro Kannada', serif`;
-                ctx.fillText('ನಮ್ಮ ಹೆಮ್ಮೆ, ನಮ್ಮ ನಾಡಹಬ್ಬ ದಸರಾ ಹಬ್ಬದ ಹಾರ್ದಿಕ ಶುಭಾಶಯಗಳು!', width / 2, corridorCenterY - kannadaFontSize * 0.48);
+                ctx.fillText('ನಮ್ಮ ಹೆಮ್ಮೆ, ನಮ್ಮ ನಾಡಹಬ್ಬ!! ದಸರಾ ಹಬ್ಬದ ಹಾರ್ದಿಕ ಶುಭಾಶಯಗಳು!', width / 2, corridorCenterY - kannadaFontSize * 0.48);
 
                 // Line 2: English "• Wishing you a spectacular Dasara! May the divine blessings of Goddess Chamundeshwari bring victory, endless joy, and prosperity to your home.  •"
                 const cyanGrad = ctx.createLinearGradient(width * 0.3, corridorCenterY + 2, width * 0.7, corridorCenterY + 22);
